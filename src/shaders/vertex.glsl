@@ -6,8 +6,15 @@ uniform sampler2D uTexture2;
 varying vec3 v_position;
 attribute float aRandom;
 varying vec3 vecPos;
+uniform vec2 uMouse;
+uniform vec2 uResolution;
 
 
+float circle(vec2 uv, vec2 disc_center, float disc_radius, float border_size) {
+      uv -= disc_center;
+      float dist = sqrt(dot(uv, uv));
+      return smoothstep(disc_radius+border_size, disc_radius-border_size, dist);
+}
 void main()
 {
     vUv = uv;
@@ -17,9 +24,13 @@ void main()
     
     float original = texture2D(uTexture, vUv).r;
     float target = texture2D(uTexture2, vUv).r;
-    
-    v_position.z = 0.15* mix(original, target, stepblend) + roundblend*0.1*sin(v_position.x*15. + uTime);
 
+    float c = circle(vUv, uMouse, 0.01, 0.2);
+    v_position.z = 0.15* mix(original+c, target+c, stepblend) + roundblend*0.1*sin(v_position.x*15. + uTime);
+    
+    
+   
+    
     // v_position.z += original*sin(uTime*2.5)*0.1*v_position.y;
     // v_position.z += target*sin(uTime*2.5)*0.1*v_position.y;
 

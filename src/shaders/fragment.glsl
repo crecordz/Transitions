@@ -4,11 +4,14 @@ uniform sampler2D uTexture2;
 uniform float uTime;
 uniform float blend;
 varying vec2 vUv;
-varying vec3 v_position;
 
+varying vec3 v_position;
+uniform vec2 uResolution;
 
 void main()
 {
+
+
     float stepblend = clamp(v_position.x + v_position.y + 3.*blend - 1., 0., 1.);
     vec4 original = (texture2D(uTexture, vUv));
     vec4 target = (texture2D(uTexture2, vUv));

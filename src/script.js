@@ -5,6 +5,7 @@ import * as dat from 'dat.gui'
 import vertexShader from './shaders/vertex.glsl'
 import fragmentShader from './shaders/fragment.glsl'
 import {gsap} from 'gsap';
+
 /**
  * Base
  */
@@ -18,6 +19,13 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+/**
+ * Sizes
+ */
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
 /**
  * Textures
  */
@@ -39,19 +47,21 @@ for(let i = 0; i < count; i++ )
 }
 
 geometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1))
-
+var uMouse = new THREE.Vector2(0,0)
 // Material
 const material = new THREE.ShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
-    // wireframe: true,
+    wireframe: true,
     // lights: true,
     uniforms:
     {
         blend: { type: 'f', value: 0.0 },
         uTime: { value: 0},
+        uMouse: { value: new THREE.Vector2(0,0) },
         uTexture: { value: pict},
-        uTexture2: { value: pict2}
+        uTexture2: { value: pict2},
+        uResolution: {type: 'v2', value: new THREE.Vector2(sizes.width,sizes.height) }
     },
     side: THREE.DoubleSide,
 
@@ -65,13 +75,7 @@ scene.add(mesh)
 
 
 
-/**
- * Sizes
- */
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
-}
+
 
 window.addEventListener('resize', () =>
 {
@@ -116,9 +120,12 @@ function mousemove(e){
     y = -(e.clientY - sizes.height/2)/ (sizes.height/2)
     scene.destination.x = x*0.2
     scene.destination.y = y*0.2
+    uMouse.x = ( (e.clientX / window.innerWidth))   ;
+    uMouse.y = 1 -( e.clientY/ window.innerHeight );
   
 }
 document.addEventListener('mousemove', mousemove)
+
 
 
 
@@ -159,7 +166,7 @@ scene.add( directionalLight );
 
 directionalLight.position.set(1, 1, 2)
 
-
+console.log(geometry)
 
 /**
  * Animate
@@ -176,7 +183,9 @@ const tick = () =>
     mesh.rotation.y += (scene.destination.x - mesh.rotation.y)* 0.5
     mesh.rotation.x -= (scene.destination.y + mesh.rotation.x)* 0.5
     
-   
+
+    material.uniforms.uMouse.value = uMouse;
+    console.log(uMouse)
     // Render
     renderer.render(scene, camera)
 
